@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Երկաստիճան ընտրանք • Հետազոտությունների մեթոդաբանություն</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Noto+Sans+Armenian:wght@400;500;600;700;800&display=swap');
+
+    :root {
+      color-scheme: light;
+      --bg: #f3f6fb;
+      --surface: rgba(255, 255, 255, .92);
+      --surface-solid: #fff;
+      --text: #192238;
+      --muted: #69758c;
+      --line: #e4e9f2;
+      --primary: #5b61e8;
+      --primary-soft: #eeefff;
+      --mint: #27b89a;
+      --mint-soft: #e5f8f3;
+      --orange: #f4a340;
+      --orange-soft: #fff4e4;
+      --shadow: 0 24px 70px rgba(40, 55, 95, .13);
+      --radius: 28px;
+    }
+
+    body.dark {
+      color-scheme: dark;
+      --bg: #101624;
+      --surface: rgba(27, 36, 54, .94);
+      --surface-solid: #1b2436;
+      --text: #edf1fa;
+      --muted: #a0acc2;
+      --line: #303b51;
+      --primary: #989bff;
+      --primary-soft: #2b2d53;
+      --mint: #59d4b6;
+      --mint-soft: #1d3938;
+      --orange: #ffc274;
+      --orange-soft: #413322;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .3);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(91, 97, 232, .11), transparent 28%),
+        radial-gradient(circle at 92% 88%, rgba(39, 184, 154, .10), transparent 27%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Noto Sans Armenian", "Manrope", sans-serif;
+      transition: background .3s ease, color .3s ease;
+    }
+
+    button { font: inherit; }
+
+    .app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 24px clamp(16px, 4vw, 60px) 26px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      width: min(1180px, 100%);
+      margin: 0 auto 20px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      font-weight: 800;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 14px;
+      color: #fff;
+      background: linear-gradient(135deg, #7479ff, #4f54d8);
+      box-shadow: 0 8px 20px rgba(91, 97, 232, .3);
+      font-size: 20px;
+    }
+
+    .toolbar { display: flex; gap: 9px; }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-width: 43px;
+      height: 43px;
+      padding: 0 13px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform .2s, border-color .2s;
+    }
+
+    .icon-btn:hover { transform: translateY(-2px); border-color: var(--primary); }
+    .icon-btn span { font-size: 17px; }
+    .icon-btn small { font-size: 12px; font-weight: 700; }
+
+    .progress-wrap {
+      width: min(1180px, 100%);
+      margin: 0 auto 18px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 6px;
+      background: var(--line);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 14.28%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--primary), var(--mint));
+      transition: width .45s ease;
+    }
+
+    .stage {
+      flex: 1;
+      display: grid;
+      place-items: center;
+      width: min(1180px, 100%);
+      min-height: 540px;
+      margin: 0 auto;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      animation: enter .4s ease both;
+    }
+
+    .slide.active { display: block; }
+
+    @keyframes enter {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(25px, 5vw, 58px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      right: -110px;
+      top: -115px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(91,97,232,.12), transparent 68%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 99px;
+      color: var(--primary);
+      background: var(--primary-soft);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      max-width: 950px;
+      margin: 20px 0 14px;
+      font-size: clamp(30px, 5vw, 55px);
+      line-height: 1.24;
+      letter-spacing: -.035em;
+    }
+
+    h2 {
+      margin: 17px 0 12px;
+      font-size: clamp(27px, 4vw, 43px);
+      line-height: 1.25;
+      letter-spacing: -.03em;
+    }
+
+    h3 { font-size: 17px; margin-bottom: 9px; }
+
+    .lead {
+      max-width: 900px;
+      color: var(--muted);
+      font-size: clamp(15px, 1.8vw, 18px);
+      line-height: 1.85;
+    }
+
+    .cover-card { padding: clamp(24px, 4.5vw, 52px); }
+
+    .cover-subtitle {
+      max-width: 900px;
+      margin: 0;
+      color: var(--primary);
+      font-size: clamp(15px, 2vw, 20px);
+      font-weight: 800;
+      line-height: 1.7;
+    }
+
+    .student-line {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      margin: 22px 0 26px;
+      padding: 11px 15px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface-solid);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .cover-divider {
+      height: 1px;
+      margin: 0 0 24px;
+      background: var(--line);
+    }
+
+    .cover-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.25fr;
+      gap: 16px;
+    }
+
+    .cover-info {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 19px;
+      background: var(--surface-solid);
+    }
+
+    .cover-info-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .cover-info p {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.8;
+    }
+
+    .cover-problem {
+      margin-top: 16px;
+      padding: 22px;
+      border: 1px solid rgba(91,97,232,.18);
+      border-radius: 20px;
+      background: var(--primary-soft);
+    }
+
+    .cover-problem .cover-info-label {
+      color: var(--primary);
+      margin-bottom: 11px;
+    }
+
+    .cover-problem p {
+      margin: 0;
+      font-size: clamp(14px, 1.7vw, 16px);
+      line-height: 1.85;
+    }
+
+    .table-wrap {
+      margin-top: 22px;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface-solid);
+    }
+
+    table {
+      width: 100%;
+      min-width: 600px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 15px 17px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    td { font-weight: 700; }
+    tr:last-child td { border-bottom: 0; }
+
+    .community {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .community-dot {
+      width: 10px;
+      height: 10px;
+      flex: 0 0 10px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 0 5px var(--primary-soft);
+    }
+
+    .community-dot.mint { background: var(--mint); box-shadow: 0 0 0 5px var(--mint-soft); }
+    .community-dot.orange { background: var(--orange); box-shadow: 0 0 0 5px var(--orange-soft); }
+
+    .section-label {
+      margin-top: 26px;
+      margin-bottom: 13px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .question-layout {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .question-card {
+      width: 100%;
+      padding: 22px;
+      text-align: left;
+      color: var(--text);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface-solid);
+      cursor: pointer;
+      transition: transform .2s, border-color .2s, box-shadow .2s;
+    }
+
+    .question-card:hover,
+    .question-card[aria-expanded="true"] {
+      transform: translateY(-2px);
+      border-color: var(--primary);
+      box-shadow: 0 12px 28px rgba(60, 75, 130, .08);
+    }
+
+    .question-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 13px;
+    }
+
+    .question-number {
+      display: grid;
+      place-items: center;
+      width: 38px;
+      height: 38px;
+      flex: 0 0 38px;
+      border-radius: 13px;
+      color: var(--primary);
+      background: var(--primary-soft);
+      font-weight: 800;
+    }
+
+    .question-title {
+      display: block;
+      padding-top: 3px;
+      font-size: 15px;
+      font-weight: 800;
+      line-height: 1.6;
+    }
+
+    .question-hint {
+      display: block;
+      margin: 13px 0 0 51px;
+      color: var(--primary);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .question-answer {
+      display: none;
+      margin: 15px 0 0 51px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .question-answer.open { display: block; }
+
+    .columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 17px;
+      margin-top: 24px;
+    }
+
+    .info-panel {
+      padding: 21px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface-solid);
+    }
+
+    .info-panel p, .info-panel li {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .info-panel p:last-child { margin-bottom: 0; }
+
+    .accent-line {
+      width: 38px;
+      height: 4px;
+      margin-bottom: 14px;
+      border-radius: 4px;
+      background: var(--mint);
+    }
+
+    .accent-line.purple { background: var(--primary); }
+
+    .formula {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 22px 0;
+      padding: 20px;
+      border: 1px solid rgba(91,97,232,.18);
+      border-radius: 20px;
+      background: var(--primary-soft);
+      text-align: center;
+    }
+
+    .formula code {
+      color: var(--primary);
+      font-family: "Noto Sans Armenian", "Manrope", sans-serif;
+      font-size: clamp(17px, 2.5vw, 23px);
+      font-weight: 800;
+      line-height: 1.7;
+    }
+
+    .math-detail {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    .calc-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 15px;
+      margin-top: 23px;
+    }
+
+    .calc-card {
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface-solid);
+      transition: transform .2s, border-color .2s;
+    }
+
+    .calc-card:hover { transform: translateY(-4px); border-color: var(--primary); }
+    .calc-card .name { color: var(--muted); font-size: 12px; font-weight: 800; }
+    .calc-card .equation { margin: 12px 0; font-size: 18px; font-weight: 800; }
+    .calc-card .result { color: var(--primary); font-size: 34px; font-weight: 800; }
+    .calc-card .unit { color: var(--muted); font-size: 13px; }
+
+    .total-banner {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-top: 18px;
+      padding: 20px 23px;
+      border-radius: 20px;
+      color: #fff;
+      background: linear-gradient(120deg, #5b61e8, #7779ee 60%, #45bea5);
+    }
+
+    .total-banner span { opacity: .87; font-size: 14px; }
+    .total-banner strong { font-size: clamp(24px, 4vw, 32px); }
+
+    .conclusion {
+      margin-top: 19px;
+      padding: 20px;
+      border-radius: 19px;
+      color: var(--mint);
+      background: var(--mint-soft);
+      font-weight: 800;
+      line-height: 1.75;
+    }
+
+    .bullet-list {
+      margin: 8px 0 0;
+      padding-left: 20px;
+      color: var(--muted);
+    }
+
+    .bullet-list li { margin: 5px 0; }
+
+    .step-list {
+      display: grid;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .step-item {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: var(--surface-solid);
+    }
+
+    .step-number {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 13px;
+      color: var(--primary);
+      background: var(--primary-soft);
+      font-weight: 900;
+    }
+
+    .step-item h3 { margin: 2px 0 5px; }
+    .step-item p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    /* Էջ 6-ի առանձին, ավելի հստակ և տեսողական ձևավորում */
+    .sampling-card {
+      padding: clamp(25px, 4.5vw, 55px);
+    }
+
+    .sampling-title {
+      max-width: 1040px;
+      margin: 23px 0 30px;
+      font-size: clamp(29px, 4.4vw, 48px);
+      line-height: 1.31;
+      letter-spacing: -.035em;
+    }
+
+    .sampling-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .sampling-panel {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(21px, 2.6vw, 30px);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: var(--surface-solid);
+      box-shadow: 0 9px 26px rgba(42, 56, 96, .035);
+    }
+
+    .sampling-panel::before {
+      content: "";
+      display: block;
+      width: 46px;
+      height: 5px;
+      margin-bottom: 20px;
+      border-radius: 99px;
+      background: var(--primary);
+    }
+
+    .sampling-panel.consequence-panel::before {
+      background: var(--mint);
+    }
+
+    .sampling-panel h3 {
+      margin: 0 0 12px;
+      font-size: clamp(17px, 1.8vw, 21px);
+      line-height: 1.55;
+    }
+
+    .sampling-panel p {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.9;
+    }
+
+    .answer-block {
+      position: relative;
+      margin-top: 19px;
+      padding: 18px 18px 17px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: color-mix(in srgb, var(--primary-soft) 44%, var(--surface-solid));
+    }
+
+    .consequence-panel .answer-block {
+      background: color-mix(in srgb, var(--mint-soft) 48%, var(--surface-solid));
+    }
+
+    .answer-check {
+      display: grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      margin-bottom: 11px;
+      border-radius: 10px;
+      color: var(--primary);
+      background: var(--primary-soft);
+      font-weight: 900;
+      font-size: 16px;
+    }
+
+    .consequence-panel .answer-check {
+      color: var(--mint);
+      background: var(--mint-soft);
+    }
+
+    .answer-block h4 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .answer-block p {
+      margin: 0 0 10px;
+      font-size: 13px;
+      line-height: 1.85;
+    }
+
+    .answer-block p:last-child { margin-bottom: 0; }
+
+    .answer-block strong { color: var(--text); }
+
+    .sampling-list {
+      display: grid;
+      gap: 9px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .sampling-list li {
+      position: relative;
+      padding-left: 23px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .sampling-list li::before {
+      content: "";
+      position: absolute;
+      top: .72em;
+      left: 2px;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--mint);
+      box-shadow: 0 0 0 4px var(--mint-soft);
+    }
+
+    .sampling-summary {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-top: 20px;
+      padding: 21px 23px;
+      border: 1px solid rgba(39,184,154,.12);
+      border-radius: 21px;
+      color: var(--mint);
+      background: var(--mint-soft);
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.85;
+    }
+
+    .summary-icon {
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      flex: 0 0 34px;
+      border-radius: 11px;
+      color: #fff;
+      background: var(--mint);
+      font-size: 17px;
+    }
+
+    .bottom-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      width: min(1180px, 100%);
+      margin: 18px auto 0;
+    }
+
+    .nav-side { display: flex; gap: 10px; }
+
+    .nav-btn {
+      min-height: 45px;
+      padding: 0 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      color: var(--text);
+      background: var(--surface);
+      font-weight: 800;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .nav-btn:hover:not(:disabled) { border-color: var(--primary); transform: translateY(-2px); }
+
+    .nav-btn.primary {
+      border-color: transparent;
+      color: #fff;
+      background: linear-gradient(120deg, #5b61e8, #7478ef);
+      box-shadow: 0 8px 18px rgba(91,97,232,.22);
+    }
+
+    .nav-btn:disabled { opacity: .42; cursor: not-allowed; }
+    .hint { color: var(--muted); font-size: 11px; }
+
+    @media (max-width: 720px) {
+      .app { padding: 16px 14px 20px; }
+      .topbar { margin-bottom: 15px; }
+      .brand-text { display: block; font-size: 12px; }
+      .brand { gap: 8px; }
+      .brand-mark { width: 36px; height: 36px; }
+      .icon-btn { width: 42px; padding: 0; }
+      .icon-btn small { display: none; }
+      .stage { min-height: auto; }
+      .card { padding: 24px 19px; border-radius: 23px; }
+      .cover-info-grid, .columns, .question-layout,
+      .sampling-grid { grid-template-columns: 1fr; }
+      .calc-grid { grid-template-columns: 1fr; }
+      .calc-card { display: grid; grid-template-columns: 1fr auto; align-items: center; }
+      .calc-card .equation { grid-column: 1; margin: 7px 0 0; }
+      .calc-card .result { grid-column: 2; grid-row: 1 / span 2; }
+      .calc-card .unit { display: none; }
+      .bottom-nav { margin-top: 14px; }
+      .hint { display: none; }
+      .question-answer { margin-left: 0; }
+      .sampling-title { margin-top: 19px; margin-bottom: 23px; }
+      .sampling-panel { padding: 21px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark">↗</div>
+        <div class="brand-text">Հետազոտությունների մեթոդաբանություն</div>
+      </div>
+
+      <div class="toolbar">
+        <button class="icon-btn" id="themeToggle" aria-label="Փոխել գունային ռեժիմը" title="Լույս / մութ">
+          <span id="themeIcon">🌙</span><small id="themeLabel">Մութ ռեժիմ</small>
+        </button>
+        <button class="icon-btn" id="fullscreenToggle" aria-label="Միացնել լիաէկրան ռեժիմը" title="Լիաէկրան">
+          <span>⛶</span><small>Լիաէկրան</small>
+        </button>
+      </div>
+    </header>
+
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span id="progressTitle">Առաջադրանքը</span>
+        <span id="slideCount">01 / 07</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+    </div>
+
+    <main class="stage">
+
+      <!-- Էջ 1․ Առաջադրանքի ներկայացում -->
+      <section class="slide active" data-title="Առաջադրանքը">
+        <div class="card cover-card">
+          <span class="eyebrow">📊 ՀԵՏԱԶՈՏԱԿԱՆ ԱՌԱՋԱԴՐԱՆՔ</span>
+          <h1>Թեմա՝ Հատուկ քանակական մեթոդները էմպիրիկ հետազոտություններում</h1>
+
+          <p class="cover-subtitle">
+            Առաջադրանք. Երկաստիճան ընտրանքի (Two-stage Sampling) նախագծում և ընտրության հավանականություն
+          </p>
+
+          <div class="student-line">
+            <span>🎓</span><span>Ուսանող՝ Սոֆյա Հարոյան</span>
+          </div>
+
+          <div class="cover-divider"></div>
+
+          <div class="cover-info-grid">
+            <article class="cover-info">
+              <div class="cover-info-label">🧭 Մեթոդաբանական առանցքը</div>
+              <p>Բազմափուլ ընտրանքային դիզայն տարածքային հետազոտություններում։</p>
+            </article>
+
+            <article class="cover-info">
+              <div class="cover-info-label">🏨 Հետազոտության համատեքստը</div>
+              <p>Տարածաշրջանային զբոսաշրջային կազմակերպությունների հետազոտություն՝ համայնքների և հյուրանոցների ընտրությամբ։</p>
+            </article>
+          </div>
+
+          <div class="cover-problem">
+            <div class="cover-info-label">📝 Գործնական խնդիրը</div>
+            <p>
+              Տարածաշրջանային զբոսաշրջային կազմակերպությունների հետազոտության համար կիրառվում է
+              երկաստիճան ընտրանք. 1-ին փուլում 10 համայնքներից պատահականորեն ընտրվում է 3-ը,
+              2-րդ փուլում ընտրված համայնքներից յուրաքանչյուրում ընտրվում է հյուրանոցների 25%-ը։
+              Հաշվարկել ընտրանքի ընդհանուր ծավալը և յուրաքանչյուր հյուրանոցի՝ ընտրանքում հայտնվելու
+              վերջնական հավանականությունը:
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Էջ 2․ Տվյալներն ու բացվող հարցերը -->
+      <section class="slide" data-title="Տվյալներն ու հարցը">
+        <div class="card">
+          <span class="eyebrow">01 · ՏՎՅԱԼՆԵՐ ԵՎ ՀԱՐՑԵՐ</span>
+          <h2>Ի՞նչ ունենք</h2>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Համայնք</th>
+                  <th>Հյուրանոցների ընդհանուր թիվը</th>
+                  <th>Ընտրվող բաժինը</th>
+                  <th>Ընտրվող հյուրանոցները</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><span class="community"><i class="community-dot"></i>Համայնք Ա</span></td>
+                  <td>20</td><td>25%</td><td>?</td>
+                </tr>
+                <tr>
+                  <td><span class="community"><i class="community-dot mint"></i>Համայնք Բ</span></td>
+                  <td>12</td><td>25%</td><td>?</td>
+                </tr>
+                <tr>
+                  <td><span class="community"><i class="community-dot orange"></i>Համայնք Գ</span></td>
+                  <td>16</td><td>25%</td><td>?</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3 class="section-label">Ի՞նչ պետք է գտնենք</h3>
+
+          <div class="question-layout">
+            <button class="question-card" type="button" aria-expanded="false" aria-controls="answer1">
+              <span class="question-head">
+                <span class="question-number">1</span>
+                <span class="question-title">Ինչպե՞ս հաշվարկել ընտրանքի ընդհանուր ծավալը</span>
+              </span>
+              <span class="question-hint">Սեղմեք՝ պատասխանը բացելու համար ＋</span>
+              <span class="question-answer" id="answer1">
+                Յուրաքանչյուր համայնքի հյուրանոցների թվի 25%-ն ենք հաշվում․
+                Համայնք Ա՝ 20 × 25% = 5, Համայնք Բ՝ 12 × 25% = 3,
+                Համայնք Գ՝ 16 × 25% = 4։
+                Ընդհանուր՝ 5 + 3 + 4 = <strong>12 հյուրանոց</strong>։
+              </span>
+            </button>
+
+            <button class="question-card" type="button" aria-expanded="false" aria-controls="answer2">
+              <span class="question-head">
+                <span class="question-number">2</span>
+                <span class="question-title">Որքա՞ն է հյուրանոցի վերջնական ընտրության հավանականությունը</span>
+              </span>
+              <span class="question-hint">Սեղմեք՝ պատասխանը բացելու համար ＋</span>
+              <span class="question-answer" id="answer2">
+                Հաշվի ենք առնում երկու փուլերը՝ համայնքի ընտրվելու և ընտրված համայնքի ներսում
+                հյուրանոցի ընտրվելու հավանականությունները։ Հավասար հավանականությամբ ընտրվող
+                համայնքների դեպքում՝ 3/10 × 25% = <strong>7.5%</strong>։
+              </span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Էջ 3․ Հավանականության բանաձև -->
+      <section class="slide" data-title="Բանաձևը">
+        <div class="card">
+          <span class="eyebrow">02 · ԲԱՆԱՁԵՎԸ</span>
+          <h2>Հյուրանոցի վերջնական ընտրության հավանականությունը</h2>
+          <p class="lead">
+            Հյուրանոցը վերջնական ընտրանքում հայտնվելու համար պետք է ընտրվի և՛ նրա համայնքը,
+            և՛ համայնքի ներսում՝ հյուրանոցը։
+          </p>
+
+          <div class="formula">
+            <code>
+              P(հյուրանոցն ընտրվում է) =
+              P(համայնքն ընտրվում է) ×
+              P(հյուրանոցն ընտրվում է՝ պայմանով, որ համայնքն ընտրվել է)
+            </code>
+          </div>
+
+          <div class="columns">
+            <div class="info-panel">
+              <div class="accent-line purple"></div>
+              <h3>1-ին փուլ․ համայնքի ընտրություն</h3>
+              <p>10 համայնքից պատահական ընտրվում է 3-ը, հետևաբար յուրաքանչյուր համայնքի ընտրության հավանականությունը՝</p>
+              <div class="formula" style="margin:14px 0 0;padding:15px">
+                <code>3 ÷ 10 = 0.30 = 30%</code>
+              </div>
+            </div>
+
+            <div class="info-panel">
+              <div class="accent-line"></div>
+              <h3>2-րդ փուլ․ հյուրանոցի ընտրություն</h3>
+              <p>Ընտրված համայնքի ներսում հյուրանոցների 25%-ն է ընտրվում․</p>
+              <div class="formula" style="margin:14px 0 0;padding:15px">
+                <code>25% = 0.25</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="total-banner">
+            <div>
+              <strong>Երկու փուլերի արտադրյալը՝ 7.5%</strong><br>
+              <span>30% × 25% = 0.30 × 0.25 = 0.075</span>
+            </div>
+            <div style="font-size:40px" aria-hidden="true">🎯</div>
+          </div>
+
+          <p class="math-detail" style="margin-top:14px">
+            Այս հաշվարկը ենթադրում է, որ առաջին փուլում համայնքներն ընտրվում են պատահական՝
+            հավասար հավանականությամբ։
+          </p>
+        </div>
+      </section>
+
+      <!-- Էջ 4․ Ընտրանքի ծավալի հաշվարկ -->
+      <section class="slide" data-title="Ընտրանքի ծավալը">
+        <div class="card">
+          <span class="eyebrow">03 · ԸՆՏՐԱՆՔԻ ԾԱՎԱԼԸ</span>
+          <h2>Հաշվենք յուրաքանչյուր համայնքի ընտրանքի չափը</h2>
+          <p class="lead">Յուրաքանչյուր համայնքի հյուրանոցների թիվը բազմապատկում ենք 0.25-ով։</p>
+
+          <div class="calc-grid">
+            <article class="calc-card">
+              <div>
+                <div class="name">ՀԱՄԱՅՆՔ Ա</div>
+                <div class="equation">20 × 0.25 =</div>
+              </div>
+              <div class="result">5<span class="unit"> հյուրանոց</span></div>
+            </article>
+
+            <article class="calc-card">
+              <div>
+                <div class="name">ՀԱՄԱՅՆՔ Բ</div>
+                <div class="equation">12 × 0.25 =</div>
+              </div>
+              <div class="result">3<span class="unit"> հյուրանոց</span></div>
+            </article>
+
+            <article class="calc-card">
+              <div>
+                <div class="name">ՀԱՄԱՅՆՔ Գ</div>
+                <div class="equation">16 × 0.25 =</div>
+              </div>
+              <div class="result">4<span class="unit"> հյուրանոց</span></div>
+            </article>
+          </div>
+
+          <div class="total-banner">
+            <div>
+              <strong>Ընտրանքի ընդհանուր ծավալը՝ 12 հյուրանոց</strong><br>
+              <span>5 + 3 + 4 = 12</span>
+            </div>
+            <div style="font-size:40px" aria-hidden="true">✓</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Էջ 5․ Ստուգող հարց 1 -->
+      <section class="slide" data-title="Ստուգող հարց 1">
+        <div class="card">
+          <span class="eyebrow">04 · ՍՏՈՒԳՈՂ ՀԱՐՑ 1</span>
+          <h2>Ի՞նչ գործնական և տնտեսական խնդիր է լուծում երկաստիճան ընտրանքը</h2>
+
+          <div class="columns">
+            <article class="info-panel">
+              <div class="accent-line purple"></div>
+              <h3>Գործնական խնդիրը</h3>
+              <p>
+                Հետազոտողը ցանկանում է ընտրված հյուրանոցների տվյալների հիման վրա եզրակացություններ
+                անել ամբողջ հետազոտվող համակցության՝ տվյալ տարածքի բոլոր համայնքների հյուրանոցների մասին։
+              </p>
+              <p>Ընտրանքի միջոցով կարելի է ուսումնասիրել, օրինակ՝</p>
+              <ul class="bullet-list">
+                <li>հյուրանոցների միջին զբաղվածությունը,</li>
+                <li>զբոսաշրջիկների միջին թիվը,</li>
+                <li>սենյակների զբաղվածության մակարդակը,</li>
+                <li>ծառայությունների կամ գների միջին ցուցանիշները։</li>
+              </ul>
+            </article>
+
+            <article class="info-panel">
+              <div class="accent-line"></div>
+              <h3>Տնտեսական խնդիրը</h3>
+              <p>
+                Եթե հյուրանոցները տեղակայված են բազմաթիվ համայնքներում, բոլոր համայնքների
+                հյուրանոցների ուսումնասիրությունը կարող է մեծ ժամանակ, գումար և կազմակերպչական
+                աշխատանք պահանջել։
+              </p>
+              <p>Երկաստիճան ընտրանքի դեպքում՝</p>
+              <ul class="bullet-list">
+                <li>ընտրվում են միայն որոշ համայնքներ,</li>
+                <li>դրանց ներսում ուսումնասիրվում է հյուրանոցների միայն մի մասը,</li>
+                <li>նվազում են ճանապարհածախսը, աշխատանքի ծավալը և տվյալների հավաքագրման ժամանակը։</li>
+              </ul>
+            </article>
+          </div>
+
+          <div class="conclusion">
+            Երկաստիճան ընտրանքը թույլ է տալիս ընտրված միավորների տվյալներով գնահատել ամբողջ
+            համակցությունը՝ ավելի քիչ ժամանակ և ռեսուրսներ ծախսելով։
+          </div>
+        </div>
+      </section>
+
+      <!-- Էջ 6․ Ստուգող հարց 2 -->
+      <section class="slide" data-title="Ստուգող հարց 2">
+        <div class="card sampling-card">
+          <span class="eyebrow">05 · ՍՏՈՒԳՈՂ ՀԱՐՑ 2</span>
+          <h2 class="sampling-title">
+            Ի՞նչ է ընտրանքային շրջանակը, և ի՞նչ խնդիր կառաջանա, եթե այն հնացած լինի
+          </h2>
+
+          <div class="sampling-grid">
+            <article class="sampling-panel">
+              <h3>Ի՞նչ է ընտրանքային շրջանակը</h3>
+              <p>
+                Ընտրանքային շրջանակը հետազոտության մեջ ընդգրկման ենթակա միավորների ամբողջական և
+                հնարավորինս արդիական ցանկն է, որից կատարվում է ընտրությունը։
+              </p>
+
+              <div class="answer-block">
+                <div class="answer-check" aria-hidden="true">✓</div>
+                <h4>Երկաստիճան ընտրանքի շրջանակները</h4>
+                <p>
+                  <strong>1-ին փուլ․</strong> հետազոտվող տարածքի բոլոր համայնքների ցանկը,
+                  որից ընտրվում են համայնքները։
+                </p>
+                <p>
+                  <strong>2-րդ փուլ․</strong> ընտրված յուրաքանչյուր համայնքում գործող բոլոր
+                  հյուրանոցների ցանկը, որից ընտրվում են հյուրանոցները։
+                </p>
+              </div>
+            </article>
+
+            <article class="sampling-panel consequence-panel">
+              <h3>Ի՞նչ խնդիր կառաջանա, եթե շրջանակը հնացած լինի</h3>
+              <p>
+                Եթե ընտրության հիմքում ընկած ցանկը հնացած կամ թերի է, հյուրանոցների ընտրությունը
+                կարող է չարտացոլել իրական իրավիճակը։
+              </p>
+
+              <div class="answer-block">
+                <div class="answer-check" aria-hidden="true">✓</div>
+                <h4>Հնարավոր հետևանքները</h4>
+                <ul class="sampling-list">
+                  <li>Նոր բացված հյուրանոցները կարող են բացակայել ցանկից և ընտրանքում չընդգրկվել։</li>
+                  <li>Փակված հյուրանոցները կարող են մնալ ցանկում՝ խանգարելով ընտրությանն ու տվյալների հավաքագրմանը։</li>
+                  <li>Սխալ հասցեները կամ տվյալները կարող են դժվարացնել ընտրված միավորներին գտնելը։</li>
+                  <li>Կրկնվող գրառումները կարող են որոշ հյուրանոցների ընտրության հավանականությունը մեծացնել։</li>
+                  <li>Արդյունքները կարող են կողմնակալ լինել և չներկայացնել ամբողջ համակցությունը։</li>
+                </ul>
+              </div>
+            </article>
+          </div>
+
+          <div class="sampling-summary">
+            <span class="summary-icon" aria-hidden="true">✓</span>
+            <span>
+              Ճշգրիտ ընտրանքային շրջանակը պետք է լինի ամբողջական և արդիական․ հակառակ դեպքում որոշ
+              միավորներ կարող են բաց թողնվել, սխալմամբ ընդգրկվել կամ կրկնվել՝ նվազեցնելով արդյունքների
+              ներկայացուցչականությունը։
+            </span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Էջ 7․ Թեմայի հնարավոր կիրառությունը -->
+      <section class="slide" data-title="Կիրառումը ավարտական աշխատանքում">
+        <div class="card">
+          <span class="eyebrow">06 · ՄԵԹՈԴԻ ԿԻՐԱՌՈՒՄԸ ԱՎԱՐՏԱԿԱՆ ԱՇԽԱՏԱՆՔՈՒՄ</span>
+          <h2>Տվյալահեն կառավարման ազդեցությունը ռեստորանային բիզնեսի արդյունավետության վրա (Գյումրի քաղաքի օրինակով)</h2>
+
+          <div class="cover-problem" style="margin-top:20px">
+            <div class="cover-info-label">📝 Կիրառման մտադրված տարբերակ</div>
+            <p>
+              Մտադրված եմ նախ ձևավորել Գյումրի քաղաքի ռեստորանների ամբողջական ցանկը, այնուհետև
+              ռեստորանները խմբավորել ըստ տեղակայման տարածքների կամ վարչական հատվածների։
+              Առաջին փուլում կընտրեմ որոշ հատվածներ, իսկ երկրորդ փուլում՝ ընտրված հատվածների
+              ներսում գործող ռեստորաններ։ Տվյալներ կհավաքեմ ռեստորանների կառավարման
+              տվյալահեն գործիքների օգտագործման և գործունեության արդյունավետության մասին։
+            </p>
+          </div>
+
+          <div class="step-list">
+            <article class="step-item">
+              <div class="step-number">1</div>
+              <div>
+                <h3>Սահմանել հետազոտվող համակցությունը</h3>
+                <p>
+                  Հետազոտվող համակցությունը Գյումրի քաղաքում գործող այն ռեստորաններն են, որոնք
+                  համապատասխանում են աշխատանքի սահմանած չափանիշներին։ Չափանիշները, օրինակ՝ ռեստորանի
+                  տեսակը կամ գործունեության նվազագույն տևողությունը, կսահմանեմ աշխատանքի մեթոդաբանության մեջ։
+                </p>
+              </div>
+            </article>
+
+            <article class="step-item">
+              <div class="step-number">2</div>
+              <div>
+                <h3>Կազմել առաջին փուլի ընտրանքային շրջանակը</h3>
+                <p>
+                  Կկազմեմ Գյումրիի տարածքային հատվածների կամ թաղամասերի ցանկը և դրանցից
+                  կընտրեմ հետազոտության մեջ ընդգրկվող հատվածները։ Եթե պաշտոնական վարչական բաժանումը
+                  կիրառելի չլինի, տարածքային խմբավորումը կհստակեցնեմ աշխատանքի շրջանակում։
+                </p>
+              </div>
+            </article>
+
+            <article class="step-item">
+              <div class="step-number">3</div>
+              <div>
+                <h3>Կազմել երկրորդ փուլի շրջանակը</h3>
+                <p>
+                  Ընտրված յուրաքանչյուր հատվածի համար կկազմեմ այնտեղ գործող ռեստորանների թարմ ցանկը։
+                  Ցանկը կստուգեմ, որպեսզի չներառվեն փակված վայրերը և հնարավորինս բաց չթողնվեն գործողները։
+                </p>
+              </div>
+            </article>
+
+            <article class="step-item">
+              <div class="step-number">4</div>
+              <div>
+                <h3>Ընտրել ռեստորանները և հավաքել տվյալները</h3>
+                <p>
+                  Ընտրված հատվածների ռեստորանների ցանկից պատահական եղանակով կընտրեմ հետազոտվող
+                  ռեստորանները։ Դրանցից տվյալներ կհավաքեմ կառավարման մեջ տվյալների օգտագործման և
+                  արդյունավետության ընտրված չափանիշների վերաբերյալ՝ հարցաթերթի, հարցազրույցի
+                  կամ հասանելի գործառնական տվյալների միջոցով։
+                </p>
+              </div>
+            </article>
+          </div>
+
+          <div class="columns">
+            <article class="info-panel">
+              <div class="accent-line purple"></div>
+              <h3>Տվյալահեն կառավարման հնարավոր ցուցանիշներ</h3>
+              <p>
+                Կարող եմ դիտարկել՝ արդյոք ռեստորանը օգտագործում է վաճառքի, հաճախորդների,
+                պաշարների կամ ծախսերի տվյալներ որոշումներ ընդունելիս, և որքան հաճախ է դրանք վերլուծում։
+              </p>
+            </article>
+
+            <article class="info-panel">
+              <div class="accent-line"></div>
+              <h3>Արդյունավետության հնարավոր ցուցանիշներ</h3>
+              <p>
+                Կարող եմ ուսումնասիրել աշխատանքի համար հասանելի տվյալներով չափելի ցուցանիշներ,
+                օրինակ՝ վաճառքի փոփոխությունը, ծախսերի վերահսկումը, պաշարների կառավարումը,
+                սպասարկման արագությունը կամ հաճախորդների գնահատականները։
+              </p>
+            </article>
+          </div>
+
+          <div class="conclusion">
+            Այս տարբերակում ընտրանքի առաջին փուլը տարածքային հատվածներն են, իսկ երկրորդ փուլը՝
+            ընտրված հատվածների ռեստորանները։ Ընտրանքի չափը և հատվածների քանակը կսահմանեմ
+            հետազոտության իրական շրջանակը, հասանելի ռեսուրսները և մեթոդաբանական պահանջները հաշվի առնելով։
+          </div>
+
+          <p class="math-detail" style="margin-top:14px">
+            Ընտրանքի այս կառուցվածքը ներկայացնում է մեթոդի կիրառման հնարավոր տարբերակ,
+            ոչ թե արդեն հաստատված ընտրանքի կազմը։ Վերջնական տարբերակը կհստակեցվի ռեստորանների
+            ցանկը և հետազոտության չափանիշները որոշելուց հետո։
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Սլայդների կառավարում">
+      <button class="nav-btn" id="prevBtn" disabled>← Հետ</button>
+
+      <div class="nav-side">
+        <button class="nav-btn primary" id="nextBtn">Առաջ →</button>
+        <button class="nav-btn" id="restartBtn">Սկզբից ↺</button>
+      </div>
+
+      <span class="hint">Նավարկելու համար օգտագործեք ← և → ստեղները</span>
+    </nav>
+  </div>
+
+  <script>
+    const slides = [...document.querySelectorAll(".slide")];
+    const progressBar = document.getElementById("progressBar");
+    const slideCount = document.getElementById("slideCount");
+    const progressTitle = document.getElementById("progressTitle");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    let current = 0;
+
+    function showSlide(index) {
+      current = Math.max(0, Math.min(index, slides.length - 1));
+
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("active", i === current);
+        slide.setAttribute("aria-hidden", i === current ? "false" : "true");
+      });
+
+      progressBar.style.width = ((current + 1) / slides.length) * 100 + "%";
+      slideCount.textContent =
+        String(current + 1).padStart(2, "0") + " / " +
+        String(slides.length).padStart(2, "0");
+      progressTitle.textContent = slides[current].dataset.title;
+
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current === slides.length - 1;
+      nextBtn.textContent = current === slides.length - 1 ? "Ավարտ ✓" : "Առաջ →";
+    }
+
+    prevBtn.addEventListener("click", () => showSlide(current - 1));
+    nextBtn.addEventListener("click", () => showSlide(current + 1));
+    restartBtn.addEventListener("click", () => showSlide(0));
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowRight") showSlide(current + 1);
+      if (event.key === "ArrowLeft") showSlide(current - 1);
+    });
+
+    // Բացվող հարցեր՝ 2-րդ էջում
+    document.querySelectorAll(".question-card").forEach((card) => {
+      card.addEventListener("click", (event) => {
+        if (event.target.closest(".question-answer")) return;
+
+        const answer = card.querySelector(".question-answer");
+        const isOpen = answer.classList.toggle("open");
+
+        card.setAttribute("aria-expanded", String(isOpen));
+        card.querySelector(".question-hint").textContent =
+          isOpen
+            ? "Սեղմեք՝ պատասխանը փակելու համար −"
+            : "Սեղմեք՝ պատասխանը բացելու համար ＋";
+      });
+    });
+
+    // Լույս / մութ ռեժիմ
+    const themeToggle = document.getElementById("themeToggle");
+    const themeIcon = document.getElementById("themeIcon");
+    const themeLabel = document.getElementById("themeLabel");
+
+    function setTheme(isDark) {
+      document.body.classList.toggle("dark", isDark);
+      themeIcon.textContent = isDark ? "☀️" : "🌙";
+      themeLabel.textContent = isDark ? "Լույս ռեժիմ" : "Մութ ռեժիմ";
+      localStorage.setItem("infographic-theme", isDark ? "dark" : "light");
+    }
+
+    setTheme(localStorage.getItem("infographic-theme") === "dark");
+
+    themeToggle.addEventListener("click", () => {
+      setTheme(!document.body.classList.contains("dark"));
+    });
+
+    // Լիաէկրան ռեժիմ
+    document.getElementById("fullscreenToggle").addEventListener("click", async () => {
+      try {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen();
+        } else {
+          await document.exitFullscreen();
+        }
+      } catch (error) {
+        console.warn("Լիաէկրան ռեժիմը հասանելի չէ այս բրաուզերում։", error);
+      }
+    });
+
+    showSlide(0);
+  </script>
+</body>
+</html>
